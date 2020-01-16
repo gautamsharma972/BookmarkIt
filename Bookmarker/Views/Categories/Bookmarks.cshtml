@@ -1,0 +1,309 @@
+﻿@model IEnumerable<Bookmarker.Models.BookmarksModels>
+
+@{
+    ViewData["Title"] = "Bookmarks under " + ViewBag.CategoryName;
+}
+
+<div class="container">
+    <div class="alignfull removetoppadding h-100">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="sticky-top sticky-sidebar-offset-menu authorbkg">
+                    <div class="jumbotron justify-content-between bg-primary mt-5">
+                        <div class="pl-7">
+                            <a href="@Href("~/Bookmarks/")" class="h5 text-dark"><i class="fa fa-bookmark"></i> My Bookmarks (@ViewBag.Bookmarks)</a>
+                            <hr />
+                            <a href="@Href("~/Bookmarks/Create")" class="h5 text-dark"><i class="fa fa-plus"></i> New Bookmark</a>
+                            <hr />
+                            <a href="@Href("~/Categories/")" class="active font-weight-bold h5 text-dark"><i class="fa fa-list"></i> Manage Categories (@ViewBag.Categories)</a>
+                            <hr />
+                            <a href="#" data-toggle="modal" data-target="#_addNewCategory" class="h5 text-dark"><i class="fa fa-list-alt"></i> New Category </a>
+                            <hr />
+                            <a href="@Href("~/Identity/Account/Manage/")" class="h5 text-dark align-bottom"><i class="fa fa-cog"></i> Account Settings</a>
+                            @if (ViewBag.Bookmarks > 0)
+                            {
+                                <hr />
+                                <a href="javascript:void(0);" data-toggle="modal" data-target="#_deleteAll" class="text-dark h5"><i class="fa fa-trash"></i> Delete all Bookmarks</a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12 col-lg-8 col-md-8">
+                <div class="form-group pr-7">
+
+                    <div class="card-columns">
+                        @foreach (var item in Model.OrderByDescending(a => a.DateAdded))
+                        {
+                            <div class="card border cardwithshadow onhoverup">
+
+                                @if (!string.IsNullOrEmpty(item.Image))
+                                {
+                                    <div class="pr-0 align-self-center js-fillcolor">
+                                        <a href="#">
+                                            <img class="rounded w-100" style="max-height:250px;" src="@item.Image" alt="@item.SiteName">
+                                        </a>
+                                    </div>
+                                }
+
+                                <div class="pr-0 pr-md-4 pt-4 pb-4">
+                                    <div class="col-sm-12">
+                                        <h5 class="card-title" data-link="@item.SiteLink">@item.SiteName</h5>
+
+                                        <span class="text-muted">@item.Description</span>
+
+                                        <p class="text-muted pt-2"><i class="fa fa-bookmark"></i>&nbsp;&nbsp; @item.BookmarkName</p>
+                                        <a href="@Href("~/Bookmarks/"+item.Category.Name.Trim())" title="Show category under @item.Category.Name" class="badge badge-secondary">@item.Category.Name</a>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <span class="text-muted">
+                                        <a href="@item.SiteLink" target="_blank" class="text-muted"><i class="fa fa-link"></i></a>
+                                    </span><span class="fa fa-dot text-muted">&nbsp;</span>
+                                    <span class="text-muted">
+                                        <a href="https://www.facebook.com/sharer/sharer.php?u=@item.SiteLink" class="text-muted" target="_blank">
+                                            <i class="fab fa-facebook-f"></i>
+                                        </a>
+                                    </span>
+                                    <span class="text-muted float-right">
+                                        @item.DateAdded.ToString("dd MMM yy") @*at @item.DateAdded.ToString("h:mm tt")*@
+                                        <span class="text-muted">&nbsp;|&nbsp;</span>
+
+                                        <a href="#" data-toggle="modal" class="editbtn" onclick="EditBookmark('@item.Id');" data-link="@Href("~/Bookmarks/Edit/"+item.Id)" data-target="#_edit"><i class="fa fa-edit"></i></a> &nbsp;&nbsp;
+                                        <a href="#" data-toggle="modal" onclick="DeleteBookmark('@item.Id');" class="text-danger" data-target="#_delete"><i class="fa fa-trash"></i></a>
+                                    </span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div class="featured-category spanborder text-right mt-5 pb-3 text-uppercase smaller">
+                        <a href="@Href("~/Bookmarks")">
+                            All Bookmarks <i class="fa fa-angle-right"></i>
+                        </a>
+                        <a class="float-left">BOOKMARKS IN @ViewBag.CategoryName.ToUpper()</a>
+                        <div class="clearfix"></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="_addNewCategory" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">New Category</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form asp-controller="Bookmarks" asp-action="NewCategory" data-ajax-begin="onBegin"
+                  data-ajax-failure="NotifyError" data-ajax-success="Notify"
+                  data-ajax="true" data-ajax-method="POST">
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <label>Give your Category a name</label>
+                            <input type="text" required name="category" class="form-control" placeholder="e.g. Social Medias" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary closeBt" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add New</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="_edit" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div id="editBt">
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="_delete" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div id="deleteBt">
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="_deleteAll" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div id="deleteBt" class="text-center">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5>Are you sure to delete all your Bookmarks?</h5>
+
+                </div>
+                <div class="modal-footer">
+                    <p>&nbsp;</p>
+                    <button onclick="DeleteallBookmark();" class="btn btn-danger">Delete</button>
+                    <button data-dismiss="modal" class="btn btn-primary">No</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <script src="~/assets/js/jquery.fillcolor.js"></script>
+    <script type="text/javascript">
+          var onBegin = function () {
+            $("#loader").fadeIn();
+           
+        };
+        function Notify(data) {
+            $("#loader").fadeOut();
+
+            if (data.error == true) {
+                Swal.fire({
+                    icon: "success",
+                    html: data.msg,
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+            }
+            else {
+                Swal.fire({
+                    icon: "success",
+                    html: data.msg,
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                window.setTimeout(function () { window.location.href = "/Bookmarks" }, 2000);
+
+            }
+
+        }
+        function NotifyError(data) {
+            $("#loader").fadeOut();
+            Swal.fire({
+                title: "Error!",
+                text: "Some error occurred, please try again later.",
+                buttonsStyling: true
+            });
+
+        }
+
+        function SuccessCat(data) {
+            var selectCat = $('.select-cat');
+            selectCat.append(
+                $('<option selected></option>').val(data.category.id).html(data.category.name)
+            );
+            $(".closeBt").click();
+            $("body").fadeIn();
+            $(".select-cat").focus();
+        }
+
+        $(function () {
+            $('.js-fillcolor').fillColor();
+
+
+        });
+        function EditBookmark(id) {
+            var url = '/Bookmarks/Edit/' + id;
+            $.get(url, function (data) {
+                $('#editBt').html(data);
+
+                $('#_edit').modal('show');
+                $.ajax({
+                type: 'POST',
+                url: '@Url.Action("Preview", "Bookmarks")',
+                data: { url: $(".site-link").val() },
+                success: function (data) {
+                    $("#detailBt").fadeIn();
+                    $(".site-name").val(data.title);
+                    $("#title").text(data.title);
+                    $("#desc").text(data.description);
+                    $("#url").text(data.url);
+                    $("#imgdiv").html('');
+                     $("#sName").val(data.title);
+
+                    $("#sDescription").val(data.description);
+                    $("#sLink").val(data.url);
+
+                    $.each(data.lstImages, function (e, element) {
+                        $("#imgdiv").append("<img src='" + element + "' class='img-rounded img-responsive'/>");
+                        $("#sImage").val(element);
+                    });
+                     $("#loader").fadeOut();
+                   var btn = document.getElementById('btnCreate');
+                   btn.disabled = false;
+                }
+            });
+            });
+        }
+
+
+        function DeleteBookmark(id) {
+            var url = '/Bookmarks/Delete/' + id;
+            $.get(url, function (data) {
+                $('#deleteBt').html(data);
+
+                $('#_delete').modal('show');
+                 $.ajax({
+                type: 'POST',
+                url: '@Url.Action("Preview", "Bookmarks")',
+                data: { url: $(".site-link").val() },
+                success: function (data) {
+                    $("#detailBt").fadeIn();
+                    $(".site-name").val(data.title);
+                    $("#title").text(data.title);
+                    $("#desc").text(data.description);
+                    $("#url").text(data.url);
+                    $("#imgdiv").html('');
+
+                    $.each(data.lstImages, function (e, element) {
+                        $("#imgdiv").append("<img src='" + element + "' class='img-rounded img-responsive'/>");
+
+                    });
+                     $("#loader").fadeOut();
+
+                }
+            });
+            });
+        }
+
+         function DeleteallBookmark() {
+            $("#loader").fadeIn();
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("RemoveAll", "Bookmarks")',
+
+                success: function (data) {
+                    $("#loader").fadeOut();
+                    if (data.error == true) {
+                        Swal.fire({
+                            icon: "error",
+                            html: data.msg,
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        window.setTimeout(function () { window.location.href = "/Bookmarks" }, 2000);
+
+                    } else {
+                        Swal.fire({
+                            icon: "success",
+                            html: data.msg,
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        window.setTimeout(function () { window.location.href = "/Bookmarks" }, 2000);
+                    }
+                }
+            });
+        }
+    </script>
+}

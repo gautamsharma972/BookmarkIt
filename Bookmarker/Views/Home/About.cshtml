@@ -1,0 +1,65 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "About";
+     ViewData["Description"] = "About BookmarkIt - Your digital Bookmarklet, Bookmark anything, access anywhere.";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 mt-3">
+            <h4 class="font-weight-bold">About</h4>
+            <p>
+                Using BookmarkIt, you can create bookmarks of any site, including Videos, articles, etc. You can access
+                your Bookmarks from anywhere, no need to worries about Browser's sync, different browser's bookmarks and some hassle
+                stuffs.
+            </p>
+            <b>How to use?</b>
+            <p>
+                You need to create an account with BookmarkIt, we only use your Email Id to register and login you, your Email Id and
+                other provided data is safe with us and lives in your control. To register click
+                <a href="@Href("~/Identity/Account/Register")" class="text-primary">here</a>. If you're already registered, click
+                <a href="@Href("~/Identity/Account/Login")" class="text-primary">here</a> to login.
+                <br />
+                To create a new Bookmark, go to <a href="@Href("~/Bookmarks/Create")">New Bookmarks</a> page and provide the site details
+                you are creating Bookmark of, you can access your Bookmarks from this page - <a href="@Href("~/Bookmarks")" class="text-primary">My Bookmarks</a>.
+
+            </p>
+            <p>
+                If you own a site, and need to create bookmarks for your users, you can add our bookmark integration. We are open for feedbacks and suggestions
+                you can send your opinions by emailing us <a href="mailto:gautamsharma972@gmail.com" class="text-primary">here</a>.
+                <br /> <br />
+                <b>Integrate in your Site </b>  <br />
+                Add the following code below the articles/blogs and anywhere you would like to create Bookmarks for.
+                <br />
+                <xmp>
+                    <!-- Inclulde the FontAwesome css, if you're already using, no need to include  -->
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+                    <!-- Inclulde the button css, you can customize always! :)  -->
+                    <link href="https://localhost:44325/cdn/Requests/BookmarkIt.css" rel="stylesheet" />
+                    <!-- Html div where you want to include in your site, you can modify according to your requirements but do not remove the class = "bookmarkIt" -->
+                    <div class="bookmarkIt"></div>
+                    <!-- Inclulde the Ajax Scripts if you already have this script no need to include this.  -->
+                    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+                    <script src="https://localhost:44325/cdn/Requests/bookmarkIt.js"></script>
+                </xmp>
+
+            </p>
+            <p>That's it, no more coding required to embed.</p>
+            <p>&nbsp;</p>
+            <p>
+                If you have any suggestions and feedback, please mail us mentioned above. Thank You for using our services. Read our Privacy Policy
+                <a href="@Href("~/Privacy")" class="text-primary">here</a>.
+            </p>
+            <div class="text-center mt-5">
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <a href="@Href("~/Bookmarks/")" class="btn btn-dark btn-lg">See your Bookmarks here</a>
+                }
+                else
+                {
+                    <a class="btn btn-dark btn-lg" id="register" asp-area="Identity" asp-page="/Account/Register">Get Started</a>
+                }
+            </div>
+        </div>
+    </div>
+</div>

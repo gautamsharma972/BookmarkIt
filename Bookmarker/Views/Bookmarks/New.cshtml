@@ -1,0 +1,254 @@
+﻿@model Bookmarker.Models.BookmarksModels
+@{
+    ViewData["Title"] = "Add to Bookmarks";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <link rel="apple-touch-icon" sizes="76x76" href="~/assets/img/favicon.ico">
+    <link rel="icon" type="image/png" href="~/assets/img/favicon.ico">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <title>Add new Bookmark - BookmarkIt</title>
+    <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no' name='viewport' />
+    <link href="https://fonts.googleapis.com/css?family=Playfair+Display:400,700|Source+Sans+Pro:400,600,700" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+
+    <link href="~/assets/css/main.css" rel="stylesheet" />
+</head>
+<body>
+
+    <nav class="topnav navbar navbar-expand-lg navbar-light bg-white fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="@Href("~/")"><strong>BookmarkIt</strong></a>
+
+        </div>
+    </nav>
+    <div class="container">
+
+        <form asp-controller="Bookmarks" asp-action="New" data-ajax-begin="onBegin"
+              data-ajax-failure="NotifyError" data-ajax-success="Notify"
+              data-ajax="true" data-ajax-method="POST">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group row">
+                <div class="col-sm-12">
+                    <h4><strong>Add to Bookmarks</strong></h4>
+                    <hr />
+
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-sm-12">
+                    <label asp-for="SiteLink"></label>
+                    <input onkeyup="getSiteDesc();" value="@Model.SiteLink" placeholder="e.g. https://www.wikipedia.com" class="form-control site-link" />
+                    <span class="text-danger" asp-validation-for="SiteLink"></span>
+
+                </div>
+            </div>
+            <div class="form-group row">
+
+
+            </div>
+            <div class="form-group row">
+                <div class="col-sm-7">
+                    <label>Add to Category</label>
+
+                    <div class="input-group mb-3">
+                        <select asp-for="SelectedCategory" required class="form-control select-cat" asp-items="@Model.AvailableBookmarkTypes">
+                            <option disabled value="0">Select..</option>
+                        </select>
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#_addNewCategory">
+                                <i class="fa fa-plus"></i> Add New
+                            </button>
+                        </div>
+                    </div>
+
+
+                    <span class="text-danger" asp-validation-for="SelectedCategory"></span>
+
+                </div>
+                <div class="col-sm-5">
+                    <label>Give this Bookmark a name</label>
+                    <input asp-for="BookmarkName" required class="form-control" />
+                    <span class="text-danger" asp-validation-for="BookmarkName"></span>
+                </div>
+            </div>
+            <div class="form-group" id="detailBt" style="display:none;">
+                <div class="card bg-lightblue">
+                    <div class="row">
+                        <div class="col-sm-2">
+                            <div id="imgdiv"></div>
+                        </div>
+                        <div class="col-sm-10 float-left pt-1 pb-1">
+                            <h5 id="title"></h5>
+                            <p class="text-muted" id="desc"></p>
+                            <p class="text-muted" id="url"></p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <input type="hidden" id="sName" asp-for="SiteName" class="form-control site-name" />
+                <input type="hidden" id="sLink" asp-for="SiteLink" />
+                <input type="hidden" id="sDescription" asp-for="Description" />
+                <input type="hidden" id="sImage" asp-for="Image" />
+            </div>
+            <div class="form-group row">
+
+                <div class="col-sm-12">
+                    <input type="submit" id="btnCreate" disabled class="btn btn-dark" value="Create" />
+                    <a href="javascript:this.close();" class="btn btn-danger">Cancel</a>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+    <div class="container mt-5">
+        <footer class="bg-white border-top p-3 text-muted small">
+            <div class="row align-items-center justify-content-between">
+                <div>
+                    <span class="navbar-brand mr-2"><strong>BookmarkIt</strong></span> Copyright &copy;
+                    <script>document.write(new Date().getFullYear())</script>
+                    . All rights reserved.
+                </div>
+                <div>
+                    Made by <a target="_blank" class="text-secondary font-weight-bold" href="#">Shakyens</a>.
+                    <a href="@Href("~/About")" class="text-muted">About</a>
+                    &nbsp;|&nbsp;
+                    <a href="@Href("~/Privacy")" class="text-muted">Privacy Policy</a>
+
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <div class="modal fade" id="_addNewCategory" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">New Category</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form asp-controller="Bookmarks" asp-action="NewCategory" data-ajax-begin="onBegin"
+                      data-ajax-failure="NotifyError" data-ajax-success="SuccessCat"
+                      data-ajax="true" data-ajax-method="POST">
+                    <div class="modal-body">
+                        <div class="form-group row">
+                            <div class="col-sm-12">
+                                <label>Give your Category a name</label>
+                                <input type="text" required name="category" class="form-control" placeholder="e.g. Social Medias" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary closeBt" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Add New</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="loader" class="loader" style="display:none;"></div>
+    <script src="~/assets/js/vendor/jquery.min.js" type="text/javascript"></script>
+    <script src="~/assets/js/vendor/popper.min.js" type="text/javascript"></script>
+    <script src="~/assets/js/vendor/bootstrap.min.js" type="text/javascript"></script>
+    <script src="~/assets/js/functions.js" type="text/javascript"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.unobtrusive-ajax.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <script type="text/javascript">
+            $(document).ready(function() {
+                getSiteDesc();
+            });
+        var onBegin = function () {
+            $("#loader").fadeIn();
+            var btn = document.getElementById('btnCreate');
+                   btn.disabled = false;
+        };
+        function Notify(data) {
+            $("#loader").fadeOut();
+
+            if (data.error == true) {
+                Swal.fire({
+                    icon: "success",
+                    html: data.msg,
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+            }
+            else {
+              Swal.fire({
+                    icon: "success",
+                    html: data.msg,
+                    showConfirmButton: false,
+                    timer: 1500
+              });
+                window.setTimeout(function () { this.window.close(); }, 2000);
+
+            }
+
+        }
+        function NotifyError(data) {
+            $("#loader").fadeOut();
+            Swal.fire({
+                title: "Error!",
+                text: "Some error occurred, please try again later.",
+                buttonsStyling: true
+            });
+
+        }
+
+        function SuccessCat(data) {
+            var selectCat = $('.select-cat');
+            selectCat.append(
+                $('<option selected></option>').val(data.category.id).html(data.category.name)
+            );
+            $(".closeBt").click();
+            $("body").fadeIn();
+            $(".select-cat").focus();
+        }
+
+
+        function getSiteDesc() {
+
+            $("#loader").fadeIn();
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("Preview", "Bookmarks")',
+                data: { url: $(".site-link").val() },
+                success: function (data) {
+                    $("#detailBt").fadeIn();
+                    $(".site-name").val(data.title);
+                    $("#title").text(data.title);
+                    $("#desc").text(data.description);
+                    $("#url").text(data.url);
+                    $("#imgdiv").html('');
+                     $("#sName").val(data.title);
+
+                    $("#sDescription").val(data.description);
+                    $("#sLink").val(data.url);
+
+                    $.each(data.lstImages, function (e, element) {
+                        $("#imgdiv").append("<img src='" + element + "' class='img-rounded img-responsive'/>");
+                        $("#sImage").val(element);
+                    });
+                     $("#loader").fadeOut();
+                   var btn = document.getElementById('btnCreate');
+                   btn.disabled = false;
+                }
+            });
+        }
+    </script>
+
+
+</body>
+</html>

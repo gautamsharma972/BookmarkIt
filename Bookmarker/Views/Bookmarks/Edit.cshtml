@@ -1,0 +1,79 @@
+﻿@model Bookmarker.Models.BookmarksModels
+
+<div class="modal-content">
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Edit - @Model.BookmarkName</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <form asp-controller="Bookmarks" asp-action="Edit" data-ajax-begin="onBegin"
+          data-ajax-failure="NotifyError" data-ajax-success="Notify"
+          data-ajax="true" data-ajax-method="POST">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="container mt-4">
+
+            <div class="form-group row">
+                <div class="col-sm-12">
+                    <label asp-for="SiteLink"></label>
+                    <input value="@Model.SiteLink" onload="getSiteDesc();" onkeyup="getSiteDesc();" placeholder="e.g. https://www.wikipedia.com" class="form-control site-link" />
+                    <span class="text-danger" asp-validation-for="SiteLink"></span>
+
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-sm-7">
+                    <label>Category</label>
+
+                    <div class="input-group mb-3">
+                        <select asp-for="SelectedCategory" required class="form-control select-cat" asp-items="@Model.AvailableBookmarkTypes">
+                            <option disabled value="0">Select..</option>
+                        </select>
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#_addNewCategory">
+                                <i class="fa fa-plus"></i> New
+                            </button>
+                        </div>
+                    </div>
+
+
+                    <span class="text-danger" asp-validation-for="SelectedCategory"></span>
+
+                </div>
+                <div class="col-sm-5">
+                    <label>Bookmark's name</label>
+                    <input asp-for="BookmarkName" required class="form-control" />
+                    <span class="text-danger" asp-validation-for="BookmarkName"></span>
+                </div>
+            </div>
+            <div class="form-group" id="detailBt" style="display:none;">
+                <div class="card bg-lightblue">
+                    <div class="row">
+                        <div class="col-sm-2">
+                            <div id="imgdiv"></div>
+                        </div>
+                        <div class="col-sm-10 float-left pt-1 pb-1">
+                            <h5 id="title"></h5>
+                            <p class="text-muted" id="desc"></p>
+                            <p class="text-muted" id="url"></p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <input type="hidden" id="sName" asp-for="SiteName" class="form-control site-name" />
+                <input type="hidden" id="sLink" asp-for="SiteLink" />
+                <input type="hidden" id="sDescription" asp-for="Description" />
+                <input type="hidden" id="sImage" asp-for="Image" />
+            </div>
+            <div class="form-group row">
+
+                <div class="col-sm-12">
+                    <input type="submit" id="btnCreate" disabled class="btn btn-dark" value="Save Changes" />
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>

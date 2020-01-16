@@ -1,0 +1,231 @@
+﻿
+@model IEnumerable<Bookmarker.Models.CategoryModels>
+
+@{
+    ViewData["Title"] = "Categories";
+    //var _categories = ViewData["Categories"] as List<Bookmarker.Models.CategoryModels>;
+    //var _bookmarks = ViewData["Bookmarks"] as List<Bookmarker.Models.BookmarksModels>;
+}
+<div class="container">
+    <div class="alignfull removetoppadding h-100">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="sticky-top sticky-sidebar-offset-menu authorbkg">
+                    <div class="jumbotron justify-content-between bg-primary mt-5">
+                        <div class="pl-7">
+                            <a href="@Href("~/Bookmarks/")" class="h5 text-dark"><i class="fa fa-bookmark"></i> My Bookmarks (@ViewData["Bookmarks"])</a>
+                            <hr />
+                            <a href="@Href("~/Bookmarks/Create")" class="h5 text-dark"><i class="fa fa-plus"></i> New Bookmark</a>
+                            <hr />
+                            <a href="@Href("~/Categories/")" class="active font-weight-bold h5 text-dark"><i class="fa fa-list"></i> Manage Categories (@Model.Count())</a>
+                            <hr />
+                            <a href="#" data-toggle="modal" data-target="#_addNewCategory" class="h5 text-dark"><i class="fa fa-list-alt"></i> New Category </a>
+                            <hr />
+                            <a href="@Href("~/Identity/Account/Manage/")" class="h5 text-dark align-bottom"><i class="fa fa-cog"></i> Account Settings</a>
+                            @if (Int32.Parse(ViewData["Bookmarks"].ToString()) > 0)
+                            {
+                                <hr />
+                                <a href="javascript:void(0);" data-toggle="modal" data-target="#_deleteAll" class="text-dark h5"><i class="fa fa-trash"></i> Delete all Bookmarks</a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12 col-lg-8 col-md-8">
+                <div class="form-group pr-7 mt-3">
+                    @*<h6 class="spanborder">
+                         <span>CATEGORIES</span>
+                        <div class="float-right">
+                             <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#_addNewCategory">
+                                 <i class="fa fa-plus"></i> Add New
+                             </button>
+                         </div>
+                                    </h6> *@
+                    <div class="form-group row">
+                        @foreach (var item in Model.OrderByDescending(a => a.Bookmarks.Count))
+                        {
+                            <div class="col-sm-4">
+                                <div class="card mb-2">
+                                    <div class="card-body">
+                                        <h5 class="card-title font-weight-bold">
+                                            @item.Name
+                                        </h5>
+
+                                        <p class="text-muted">
+                                            @item.DateCreated.ToString("dd MMM yy @ hh:mm tt")
+                                        </p>
+
+                                        <p>
+                                            <a href="#" data-toggle="modal" class="editbtn" onclick="EditCategory('@item.Id');"
+                                               data-link="@Href("~/Categories/Edit/"+item.Id)" data-target="#_editCategory"><i class="fa fa-edit"></i></a> &nbsp;&nbsp;
+                                            <a href="#" data-toggle="modal" class="text-danger" data-target="#_deleteCategory" onclick="DeleteCategory('@item.Id');"><i class="fa fa-trash"></i></a>
+
+                                        </p>
+                                    </div>
+                                    <div class="card-footer">
+                                        <a href="@Url.Action("Bookmarks", "Categories", new { name = item.Name})"
+                                           class="text-primary text-center">View Bookmarks (@item.Bookmarks.Count)</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                        }
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="_addNewCategory" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">New Category</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form asp-controller="Bookmarks" asp-action="NewCategory" data-ajax-begin="onBegin"
+                  data-ajax-failure="NotifyError" data-ajax-success="Notify"
+                  data-ajax="true" data-ajax-method="POST">
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <label>Give your Category a name</label>
+                            <input type="text" required name="category" class="form-control" placeholder="e.g. Social Medias" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary closeBt" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add New</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="_editCategory" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content" id="editContent">
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="_deleteCategory" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content" id="deleteContent">
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="_deleteAll" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div id="deleteBt" class="text-center">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5>Are you sure to delete all your Bookmarks?</h5>
+
+                </div>
+                <div class="modal-footer">
+                    <p>&nbsp;</p>
+                    <button onclick="DeleteallBookmark();" class="btn btn-danger">Delete</button>
+                    <button data-dismiss="modal" class="btn btn-primary">No</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <script type="text/javascript">
+        var onBegin = function () {
+            $("#loader").fadeIn();
+
+        };
+        function Notify(data) {
+            $("#loader").fadeOut();
+
+            if (data.error == true) {
+                Swal.fire({
+                    icon: "success",
+                    html: data.msg,
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+            }
+            else {
+                Swal.fire({
+                    icon: "success",
+                    html: data.msg,
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                window.setTimeout(function () { window.location.href = "/Categories" }, 2000);
+
+            }
+
+        }
+        function NotifyError(data) {
+            $("#loader").fadeOut();
+            Swal.fire({
+                title: "Error!",
+                text: "Some error occurred, please try again later.",
+                buttonsStyling: true
+            });
+
+        }
+
+        function EditCategory(id) {
+            var url = '/Categories/Edit/' + id;
+            $.get(url, function (data) {
+                $('#editContent').html(data);
+                $('#_editCategory').modal('show');
+            });
+        }
+
+        function DeleteCategory(id) {
+            var url = '/Categories/Delete/' + id;
+            $.get(url, function (data) {
+                $('#deleteContent').html(data);
+                $('#_deleteCategory').modal('show');
+            });
+        }
+         function DeleteallBookmark() {
+            $("#loader").fadeIn();
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("RemoveAll", "Bookmarks")',
+
+                success: function (data) {
+                    $("#loader").fadeOut();
+                    if (data.error == true) {
+                        Swal.fire({
+                            icon: "error",
+                            html: data.msg,
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        window.setTimeout(function () { window.location.href = "/Bookmarks" }, 2000);
+
+                    } else {
+                        Swal.fire({
+                            icon: "success",
+                            html: data.msg,
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        window.setTimeout(function () { window.location.href = "/Bookmarks" }, 2000);
+                    }
+                }
+            });
+        }
+    </script>
+}

@@ -1,0 +1,26 @@
+﻿@model Bookmarker.Models.CategoryModels
+<div class="modal-header">
+    <h5 class="modal-title" id="exampleModalLongTitle">Delete - @Model.Name</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<form asp-controller="Categories" asp-action="Delete" data-ajax-begin="onBegin"
+      data-ajax-failure="NotifyError" data-ajax-success="Notify"
+      data-ajax="true" data-ajax-method="POST">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="Name" />
+    <div class="modal-body">
+        <div class="form-group row">
+            <div class="col-sm-12">
+                <p class="lead">Sure to delete '<b>@Model.Name</b>'? 
+                All your Bookmarks under this category will be deleted.</p>
+                <p>This can not be recovered.</p>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary closeBt" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-danger">Delete</button>
+    </div>
+</form> 
